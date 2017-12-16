@@ -1,0 +1,113 @@
+
+
+<!DOCTYPE html>
+<html>
+	<head>
+		
+		<script type="text/javascript" src="jquery.js"></script>
+		<script type="text/javascript" src="mqttws31.js"></script>
+	
+		<title>BB8!</title>
+		<style>
+		body {
+			width: 640px;
+			margin: 0 auto;
+		}
+		h1 {text-align: center;}
+			
+		}
+		</style>
+	</head>
+	<body>
+	
+			   
+	
+		  <img src="bb8.png" />
+		  <input type="text" id="myInput" oninput="myFunction()">
+
+		<br>
+
+		<ul>
+			<li>a = push</li>
+			<li>b = pull</li>
+			<li>c = neutral (stop)</li>
+		</ul>
+		
+		<script>
+
+//Create a new Client object with your broker's hostname, port and your own clientId
+var seconds = new Date().getTime() / 1000;
+var uID = "d:quickstart:TestDevice:gv1234";
+var client = new Messaging.Client("quickstart.messaging.internetofthings.ibmcloud.com", 1883, uID);
+client.onMessageArrived = onMessageArrived;
+
+ 
+var options = {
+ 
+     //connection attempt timeout in seconds
+     timeout: 3,
+ 
+     //Gets Called if the connection has successfully been established
+     onSuccess: function () {
+         alert("Connected");
+         var message = new Messaging.Message('{"d":{"BB8":"Connected"}}');
+			message.destinationName = "iot-2/evt/status/fmt/json";
+			message.qos = 0;
+			client.send(message);
+	
+     },
+ 
+     //Gets Called if the connection could not be established
+     onFailure: function (message) {
+         alert("Connection failed: " + message.errorMessage);
+     }
+ 
+ };
+ 
+function myFunction() {
+    var x = document.getElementById("myInput").value;
+    console.log(x);
+    if(x == "a"){
+    	var message = new Messaging.Message('{"5":"push"}');
+			message.destinationName = "iot-2/evt/status/fmt/json";
+			message.qos = 0;
+			client.send(message);
+    }
+    if(x == "b"){
+    	var message = new Messaging.Message('{"5":"pull"}');
+			message.destinationName = "iot-2/evt/status/fmt/json";
+			message.qos = 0;
+			client.send(message);
+    }
+    if(x == "c"){
+    	var message = new Messaging.Message('{"5":"neu"}');
+			message.destinationName = "iot-2/evt/status/fmt/json";
+			message.qos = 0;
+			client.send(message);
+
+    }
+    document.getElementById("myInput").value = "";
+}
+
+
+ function onMessageArrived(message) {
+  console.log("onMessageArrived:"+message.payloadString);
+  
+
+ 
+};	
+
+
+var push = 0;
+var pull = 0;
+var net = 0;
+
+
+//Attempt to connect
+client.connect(options);	
+		</script>
+	</body>
+</html>
+
+
+
